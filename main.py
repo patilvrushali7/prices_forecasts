@@ -2,26 +2,35 @@ from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import joblib
 import pickle
+import os
 from datetime import datetime
 
 app = Flask(__name__)
 
 # Load Historical Data at Startup
 def load_historical_data():
-    try:
-        with open("histtorical_data.pkl", "rb") as f:
-            return pickle.load(f)
-    except Exception as e:
-        print(f"Error loading historical data: {str(e)}")
-        return {}
+    file_path = "histtorical_data.pkl"
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, "rb") as f:
+                return pickle.load(f)
+        except Exception as e:
+            print(f"Error loading historical data: {str(e)}")
+    else:
+        print(f"File {file_path} not found.")
+    return {}
 
 # Load Forecast Data at Startup (CSV-like format)
 def load_forecasts():
-    try:
-        return joblib.load("path_to_pkl_only_folder/all_forecasts.pkl")
-    except Exception as e:
-        print(f"Error loading forecasts: {str(e)}")
-        return {}
+    file_path = "path_to_pkl_only_folder/all_forecasts.pkl"
+    if os.path.exists(file_path):
+        try:
+            return joblib.load(file_path)
+        except Exception as e:
+            print(f"Error loading forecasts: {str(e)}")
+    else:
+        print(f"File {file_path} not found.")
+    return {}
 
 # Data loaded at startup
 historical_data = load_historical_data()
@@ -104,3 +113,4 @@ def product_info():
 # Run the Flask app
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
