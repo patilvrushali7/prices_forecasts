@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #343a40;
+        }
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 60%;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            color: #6c757d;
+            font-size: 1.2em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product Information</h1>
+
+        <!-- Form for entering product name -->
+        <form action="/product_info" method="get">
+            <input type="text" name="product_name" placeholder="Enter Product Name" required>
+            <button type="submit">Get Product Info</button>
+        </form>
+
+        {% if product_name %}
+            <p><strong>Product Name:</strong> {{ product_name }}</p>
+            {% if historical_info %}
+                <h2>Historical Data</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Year-Month</th>
+                            <th>Max Discount</th>
+                            <th>Max Discount Date</th>
+                            <th>Min Discount</th>
+                            <th>Min Discount Date</th>
+                            <th>Max Sales Price</th>
+                            <th>Min Sales Price</th>
+                            <th>Max Sales Price Date</th>
+                            <th>Min Sales Price Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in historical_info %}
+                        <tr>
+                            <td>{{ entry.year_month }}</td>
+                            <td>{{ entry.max_discount }}</td>
+                            <td>{{ entry.max_discount_date }}</td>
+                            <td>{{ entry.min_discount }}</td>
+                            <td>{{ entry.min_discount_date }}</td>
+                            <td>{{ entry.max_sales_price }}</td>
+                            <td>{{ entry.min_sales_price }}</td>
+                            <td>{{ entry.max_sales_price_date }}</td>
+                            <td>{{ entry.min_sales_price_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="message">No historical data available for this product.</p>
+            {% endif %}
+            {% if forecast_data %}
+                <h2>Forecast Data</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Forecasted Discount (%)</th>
+                            <th>Forecasted Sales Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in forecast_data %}
+                        <tr>
+                            <td>{{ entry.date }}</td>
+                            <td>{{ entry.forecasted_discount_percentage }}</td>
+                            <td>{{ entry.forecasted_sales_price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="message">No forecast data available for this product.</p>
+            {% endif %}
+        {% else %}
+            <p class="message">No product selected. Please provide a valid product name.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
