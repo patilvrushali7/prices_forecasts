@@ -4,5 +4,5 @@ requests
 joblib
 pickle-mixin  # Optional; pickle is part of Python's standard library
 werkzeug
-
+plotly
 
