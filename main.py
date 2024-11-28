@@ -2,35 +2,29 @@ from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import joblib
 import pickle
-import os
+import json
+import plotly.graph_objects as go
+import plotly.utils
 from datetime import datetime
 
 app = Flask(__name__)
 
 # Load Historical Data at Startup
 def load_historical_data():
-    file_path = "histtorical_data.pkl"
-    if os.path.exists(file_path):
-        try:
-            with open(file_path, "rb") as f:
-                return pickle.load(f)
-        except Exception as e:
-            print(f"Error loading historical data: {str(e)}")
-    else:
-        print(f"File {file_path} not found.")
-    return {}
+    try:
+        with open("histtorical_data.pkl", "rb") as f:
+            return pickle.load(f)
+    except Exception as e:
+        print(f"Error loading historical data: {str(e)}")
+        return {}
 
-# Load Forecast Data at Startup (CSV-like format)
+# Load Forecast Data at Startup
 def load_forecasts():
-    file_path = "path_to_pkl_only_folder/all_forecasts.pkl"
-    if os.path.exists(file_path):
-        try:
-            return joblib.load(file_path)
-        except Exception as e:
-            print(f"Error loading forecasts: {str(e)}")
-    else:
-        print(f"File {file_path} not found.")
-    return {}
+    try:
+        return joblib.load("path_to_pkl_only_folder/all_forecasts.pkl")
+    except Exception as e:
+        print(f"Error loading forecasts: {str(e)}")
+        return {}
 
 # Data loaded at startup
 historical_data = load_historical_data()
@@ -98,12 +92,49 @@ def product_info():
                 for _, row in forecast_df.iterrows()
             ]
 
+        # Create Plotly Graphs
+        historical_fig = go.Figure()
+        if historical_info_formatted:
+            historical_df = pd.DataFrame(historical_info_formatted)
+            historical_fig.add_trace(go.Scatter(
+                x=historical_df["year_month"],
+                y=historical_df["max_discount"],
+                mode="lines+markers",
+                name="Max Discount"
+            ))
+            historical_fig.add_trace(go.Scatter(
+                x=historical_df["year_month"],
+                y=historical_df["min_discount"],
+                mode="lines+markers",
+                name="Min Discount"
+            ))
+
+        forecast_fig = go.Figure()
+        if forecast_data:
+            forecast_df = pd.DataFrame(forecast_data)
+            forecast_fig.add_trace(go.Scatter(
+                x=forecast_df["date"],
+                y=forecast_df["forecasted_discount_percentage"],
+                mode="lines+markers",
+                name="Forecasted Discount (%)"
+            ))
+            forecast_fig.add_trace(go.Scatter(
+                x=forecast_df["date"],
+                y=forecast_df["forecasted_sales_price"],
+                mode="lines+markers",
+                name="Forecasted Sales Price"
+            ))
+
+        # Convert Plotly graphs to JSON
+        historical_graph = json.dumps(historical_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        forecast_graph = json.dumps(forecast_fig, cls=plotly.utils.PlotlyJSONEncoder)
+
         # Render the template with data
         return render_template(
             "product_info.html",
             product_name=product_name,
-            historical_info=historical_info_formatted,
-            forecast_data=forecast_data
+            historical_graph=historical_graph,
+            forecast_graph=forecast_graph
         )
 
     except Exception as e:
@@ -113,4 +144,5 @@ def product_info():
 # Run the Flask app
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
