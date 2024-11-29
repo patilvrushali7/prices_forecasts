@@ -96,6 +96,8 @@ def product_info():
         historical_fig = go.Figure()
         if historical_info_formatted:
             historical_df = pd.DataFrame(historical_info_formatted)
+            
+            # Add traces for discounts
             historical_fig.add_trace(go.Scatter(
                 x=historical_df["year_month"],
                 y=historical_df["max_discount"],
@@ -107,6 +109,20 @@ def product_info():
                 y=historical_df["min_discount"],
                 mode="lines+markers",
                 name="Min Discount"
+            ))
+            
+            # Add traces for sales prices
+            historical_fig.add_trace(go.Scatter(
+                x=historical_df["year_month"],
+                y=historical_df["max_sales_price"],
+                mode="lines+markers",
+                name="Max Sales Price"
+            ))
+            historical_fig.add_trace(go.Scatter(
+                x=historical_df["year_month"],
+                y=historical_df["min_sales_price"],
+                mode="lines+markers",
+                name="Min Sales Price"
             ))
 
         forecast_fig = go.Figure()
