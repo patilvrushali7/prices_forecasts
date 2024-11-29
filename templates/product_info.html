@@ -1,38 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Information</title>
+    <title>Product Info</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <h1>Product Information</h1>
 
     {% if product_name %}
-        <h2>{{ product_name }}</h2>
-
-        {% if historical_graph and forecast_graph %}
-            <h3>Historical Data</h3>
-            <div id="historicalChart"></div>
-            <script>
-                var historicalData = {{ historical_graph | safe }};
-                Plotly.newPlot('historicalChart', historicalData.data, historicalData.layout);
-            </script>
-
-            <h3>Forecast Data</h3>
-            <div id="forecastChart"></div>
-            <script>
-                var forecastData = {{ forecast_graph | safe }};
-                Plotly.newPlot('forecastChart', forecastData.data, forecastData.layout);
-            </script>
-        {% else %}
-            <p>No data available for the product.</p>
-        {% endif %}
+        <h2>Product: {{ product_name }}</h2>
+        <div id="historical-graph"></div>
+        <script>
+            var historicalGraph = {{ historical_graph | safe }};
+            Plotly.newPlot('historical-graph', historicalGraph.data, historicalGraph.layout);
+        </script>
+        
+        <div id="forecast-graph"></div>
+        <script>
+            var forecastGraph = {{ forecast_graph | safe }};
+            Plotly.newPlot('forecast-graph', forecastGraph.data, forecastGraph.layout);
+        </script>
     {% else %}
-        <p>No product selected.</p>
+        <p>No product selected or product not found.</p>
     {% endif %}
 </body>
 </html>
-
-
